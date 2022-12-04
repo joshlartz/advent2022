@@ -1,6 +1,3 @@
-// use itertools::Itertools;
-// use std::num::ParseIntError;
-
 pub fn generator(input: &str) -> Vec<Vec<u32>> {
     input
         .split("\n\n")
