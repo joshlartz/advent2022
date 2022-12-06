@@ -1,13 +1,13 @@
 use std::collections::HashSet;
 
 // figure out lifetimes
-// type Input = Vec<&str>;
+type Input<'a> = Vec<&'a str>;
 
-pub fn generator(input: &str) -> Vec<&str> {
+pub fn generator(input: &str) -> Input {
     input.lines().collect()
 }
 
-pub fn part1(input: &Vec<&str>) -> u32 {
+pub fn part1(input: &Input) -> u32 {
     input.iter().fold(0, |acc, line| {
         let rucksack = line.split_at(line.len() / 2);
         let left = rucksack.0.chars().collect::<HashSet<_>>();
@@ -17,7 +17,7 @@ pub fn part1(input: &Vec<&str>) -> u32 {
     })
 }
 
-pub fn part2(input: &Vec<&str>) -> u32 {
+pub fn part2(input: &Input) -> u32 {
     input
         .iter()
         .map(|rucksack| rucksack.chars().collect::<HashSet<_>>())

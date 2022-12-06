@@ -1,4 +1,6 @@
-pub fn generator(input: &str) -> Vec<Vec<u32>> {
+type Input = Vec<Vec<u32>>;
+
+pub fn generator(input: &str) -> Input {
     input
         .split("\n\n")
         .map(|chunk| {
@@ -10,11 +12,11 @@ pub fn generator(input: &str) -> Vec<Vec<u32>> {
         .collect()
 }
 
-pub fn part1(input: &Vec<Vec<u32>>) -> u32 {
+pub fn part1(input: &Input) -> u32 {
     input.iter().map(|elf| elf.iter().sum()).max().unwrap()
 }
 
-pub fn part2(input: &Vec<Vec<u32>>) -> u32 {
+pub fn part2(input: &Input) -> u32 {
     let mut summed: Vec<u32> = input.iter().map(|elf| elf.iter().sum()).collect();
     summed.sort();
     summed.iter().rev().take(3).sum()
