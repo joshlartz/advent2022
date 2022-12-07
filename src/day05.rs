@@ -22,7 +22,8 @@ pub fn generator(input: &str) -> Input {
         .map(|line| {
             re.replace_all(line, " ")
                 .chars()
-                .chunks(4).into_iter()
+                .chunks(4)
+                .into_iter()
                 .map(|c| c.collect::<String>())
                 .map(|s| s.trim().to_owned())
                 .collect_vec()
@@ -59,15 +60,22 @@ pub fn part1(input: &Input) -> String {
     let mut stacks = stacks.clone();
 
     for step in steps {
-        move_crates(&mut stacks, &step);
+        move_crates_9000(&mut stacks, &step);
     }
 
     top_crates(&stacks)
 }
 
-// pub fn part2(input: &Input) -> usize {
+pub fn part2(input: &Input) -> String {
+    let (stacks, steps) = input;
+    let mut stacks = stacks.clone();
 
-// }
+    for step in steps {
+        move_crates_9001(&mut stacks, &step);
+    }
+
+    top_crates(&stacks)
+}
 
 fn top_crates(stacks: &Vec<Stack>) -> String {
     let mut top = vec![""];
@@ -79,11 +87,20 @@ fn top_crates(stacks: &Vec<Stack>) -> String {
     top.concat()
 }
 
-fn move_crates(stacks: &mut Vec<Stack>, step: &Step) -> () {
+fn move_crates_9000(stacks: &mut Vec<Stack>, step: &Step) -> () {
     for _ in 0..step.crates {
         let _crate = stacks[step.from].pop().unwrap();
         stacks[step.to].push(_crate);
     }
+}
+
+fn move_crates_9001(stacks: &mut Vec<Stack>, step: &Step) -> () {
+    let len = stacks[step.from].len();
+    let mut crates = stacks[step.from]
+        .drain((len - step.crates)..)
+        .map(String::from)
+        .collect_vec();
+    stacks[step.to].append(&mut crates);
 }
 
 #[cfg(test)]
@@ -105,8 +122,8 @@ move 1 from 1 to 2";
         assert_eq!(part1(&generator(SAMPLE)), "CMZ");
     }
 
-    // #[test]
-    // fn test_part2() {
-    //     assert_eq!(part2(&generator(SAMPLE)), 4);
-    // }
+    #[test]
+    fn test_part2() {
+        assert_eq!(part2(&generator(SAMPLE)), "MCD");
+    }
 }
