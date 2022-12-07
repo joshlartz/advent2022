@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 aoc-main = { version = "0.4.1", features = ["bench"] }
 itertools = "0.10.5"
+regex = "1.7.0"
