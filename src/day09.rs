@@ -3,6 +3,7 @@ use std::collections::HashSet;
 type Input<'a> = Vec<Motion<'a>>;
 /** x, y */
 type Coord = (i32, i32);
+type Rope = Vec<Coord>;
 
 pub struct Motion<'a> {
     direction: &'a str,
@@ -23,44 +24,61 @@ pub fn generator(input: &str) -> Input {
 }
 
 pub fn part1(input: &Input) -> usize {
-    let mut head: Coord = (0, 0);
-    let mut tail: Coord = (0, 0);
+    let mut rope: Rope = vec![(0, 0); 2];
     let mut visited: HashSet<Coord> = HashSet::new();
 
     for motion in input.iter() {
-        move_rope(&motion, &mut head, &mut tail, &mut visited);
+        move_rope(&motion, &mut rope, &mut visited);
     }
 
     visited.len()
 }
 
-// pub fn part2(input: &Input) -> u32 {
+pub fn part2(input: &Input) -> usize {
+    let mut rope: Rope = vec![(0, 0); 10];
+    let mut visited: HashSet<Coord> = HashSet::new();
 
-// }
+    for motion in input.iter() {
+        move_rope(&motion, &mut rope, &mut visited);
+    }
 
-fn move_rope(motion: &Motion, head: &mut Coord, tail: &mut Coord, visited: &mut HashSet<Coord>) {
+    visited.len()
+}
+
+fn move_rope(motion: &Motion, rope: &mut Rope, visited: &mut HashSet<Coord>) {
+    let tail = rope.len() - 1;
     for _ in 0..motion.steps {
-        match motion.direction {
-            "U" => {
-                head.1 += 1;
-            }
-            "D" => {
-                head.1 -= 1;
-            }
-            "L" => {
-                head.0 -= 1;
-            }
-            "R" => {
-                head.0 += 1;
-            }
-            _ => unreachable!(),
+        move_head(motion.direction, &mut rope[0]);
+
+        for head in 0..tail {
+            move_knot(rope, head, head + 1)
         }
-        move_tail(head, tail, visited);
+
+        visited.insert(rope[tail]);
     }
 }
 
-fn move_tail(head: &Coord, tail: &mut Coord, visisted: &mut HashSet<Coord>) {
-    let distance: Coord = (head.0 - tail.0, head.1 - tail.1);
+fn move_head(direction: &str, head: &mut Coord) {
+    match direction {
+        "U" => {
+            head.1 += 1;
+        }
+        "D" => {
+            head.1 -= 1;
+        }
+        "L" => {
+            head.0 -= 1;
+        }
+        "R" => {
+            head.0 += 1;
+        }
+        _ => unreachable!(),
+    }
+}
+
+fn move_knot(rope: &mut Rope, head: usize, tail: usize) {
+    let distance: Coord = (rope[head].0 - rope[tail].0, rope[head].1 - rope[tail].1);
+    let tail = &mut rope[tail];
 
     if distance.0 == 0 && distance.1 > 1 {
         tail.1 += 1; // up
@@ -86,8 +104,6 @@ fn move_tail(head: &Coord, tail: &mut Coord, visisted: &mut HashSet<Coord>) {
     if (distance.0 >= 1 && distance.1 < -1) || (distance.0 > 1 && distance.1 <= -1) {
         *tail = (tail.0 + 1, tail.1 - 1); // down/right
     }
-
-    visisted.insert(*tail);
 }
 
 #[cfg(test)]
@@ -117,8 +133,9 @@ U 20";
         assert_eq!(part1(&generator(SAMPLE1)), 13);
     }
 
-    // #[test]
-    // fn test_part2() {
-    //     assert_eq!(part2(&generator(SAMPLE)), 36);
-    // }
+    #[test]
+    fn test_part2() {
+        assert_eq!(part2(&generator(SAMPLE1)), 1);
+        assert_eq!(part2(&generator(SAMPLE2)), 36);
+    }
 }
