@@ -1,4 +1,7 @@
+use itertools::Itertools;
+
 type Input = Vec<Instruction>;
+type Crt = Vec<Vec<String>>;
 
 #[derive(Clone)]
 pub enum Instruction {
@@ -85,9 +88,36 @@ pub fn part1(input: &Input) -> i32 {
     signal_strengths.iter().sum()
 }
 
-// pub fn part2(input: &Input) -> usize {
+pub fn part2(input: &Input) -> String {
+    let mut processor = Processor::new();
+    let mut crt: Crt = vec![vec![String::from(" "); 40]; 6];
 
-// }
+    let mut instructions = input.iter();
+
+    while instructions.len() > 0 || processor.instruction.is_some() {
+        if processor.blocking == 0 {
+            processor.start_processing(instructions.next());
+        }
+
+        let row = (processor.cycle - 1) / 40;
+        let position = (processor.cycle - 1) % 40;
+        let sprite = processor.register - 1..=processor.register + 1;
+        if sprite.contains(&position) {
+            crt[row as usize][position as usize] = "#".to_string();
+        }
+
+        processor.tick();
+        if processor.blocking == 0 {
+            processor.finish_processing();
+        }
+    }
+
+    convert(&crt)
+}
+
+fn convert(crt: &Crt) -> String {
+    crt.iter().map(|row| row.join("")).collect_vec().join("\n")
+}
 
 #[cfg(test)]
 mod tests {
@@ -245,8 +275,16 @@ noop";
         assert_eq!(part1(&generator(SAMPLE)), 13140);
     }
 
-    // #[test]
-    // fn test_part2() {
-    //     assert_eq!(part2(&generator(SAMPLE)), 1);
-    // }
+    #[test]
+    fn test_part2() {
+        assert_eq!(
+            part2(&generator(SAMPLE)),
+            "##  ##  ##  ##  ##  ##  ##  ##  ##  ##  
+###   ###   ###   ###   ###   ###   ### 
+####    ####    ####    ####    ####    
+#####     #####     #####     #####     
+######      ######      ######      ####
+#######       #######       #######     "
+        );
+    }
 }
