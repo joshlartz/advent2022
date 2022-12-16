@@ -78,7 +78,7 @@ fn find_visible(
             }
 
             // left or right
-            if (grid[i][0..j].iter().all(|tree| tree < col)) 
+            if (grid[i][0..j].iter().all(|tree| tree < col))
                 || (grid[i][j + 1..=col_max].iter().all(|tree| tree < col))
             {
                 seen.insert(index);

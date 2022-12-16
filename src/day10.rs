@@ -39,7 +39,9 @@ impl Processor {
     }
 
     fn finish_processing(&mut self) {
-        if let Some(Instruction::Addx(x)) = self.instruction { self.register += x }
+        if let Some(Instruction::Addx(x)) = self.instruction {
+            self.register += x
+        }
         self.instruction = None;
     }
 
