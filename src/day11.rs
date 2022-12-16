@@ -48,7 +48,11 @@ impl Monkey {
         for item in self.holding.as_mut_slice() {
             *item = (self.operation)(item);
             //reduce worry
-            if large { *item %= cycle_length } else { *item /= 3 };
+            if large {
+                *item %= cycle_length
+            } else {
+                *item /= 3
+            };
             self.inspections += 1;
         }
     }
