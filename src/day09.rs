@@ -14,7 +14,7 @@ pub fn generator(input: &str) -> Input {
     input
         .lines()
         .map(|line| {
-            let (direction, s) = line.split_once(" ").unwrap();
+            let (direction, s) = line.split_once(' ').unwrap();
             Motion {
                 direction,
                 steps: s.parse().unwrap(),
@@ -28,7 +28,7 @@ pub fn part1(input: &Input) -> usize {
     let mut visited: HashSet<Coord> = HashSet::new();
 
     for motion in input.iter() {
-        move_rope(&motion, &mut rope, &mut visited);
+        move_rope(motion, &mut rope, &mut visited);
     }
 
     visited.len()
@@ -39,7 +39,7 @@ pub fn part2(input: &Input) -> usize {
     let mut visited: HashSet<Coord> = HashSet::new();
 
     for motion in input.iter() {
-        move_rope(&motion, &mut rope, &mut visited);
+        move_rope(motion, &mut rope, &mut visited);
     }
 
     visited.len()

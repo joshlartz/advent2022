@@ -15,8 +15,8 @@ pub fn generator(input: &str) -> Input {
     let mut pointer: Vec<String> = Vec::new();
 
     for line in input.lines() {
-        match parse(line) {
-            Some(op) => match op {
+        if let Some(op) = parse(line) {
+            match op {
                 Operation::MoveUp => {
                     pointer.pop();
                 }
@@ -33,8 +33,7 @@ pub fn generator(input: &str) -> Input {
                             .and_modify(|dir| *dir += file);
                     }
                 }
-            },
-            None => (),
+            }
         }
     }
 
@@ -68,8 +67,8 @@ fn parse(line: &str) -> Option<Operation> {
         Some(Operation::MoveUp)
     } else if line.starts_with("$ cd") {
         Some(Operation::MoveDown(line[5..].to_string()))
-    } else if line.starts_with("dir ") {
-        Some(Operation::Dir(&line[4..]))
+    } else if let Some(name) = line.strip_prefix("dir ") {
+        Some(Operation::Dir(name))
     } else {
         Some(Operation::File(
             line.split_whitespace().next().unwrap().parse().unwrap(),

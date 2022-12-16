@@ -60,7 +60,7 @@ pub fn part2(input: &Input) -> u32 {
 }
 
 fn find_visible(
-    grid: &Vec<Vec<&u32>>,
+    grid: &[Vec<&u32>],
     row_max: usize,
     col_max: usize,
     seen: &mut Seen,
@@ -77,17 +77,18 @@ fn find_visible(
                 continue;
             }
 
-            if grid[i][0..j].iter().all(|tree| tree < col) {
-                seen.insert(index); // left
-            } else if grid[i][j + 1..=col_max].iter().all(|tree| tree < col) {
-                seen.insert(index); // right
+            // left or right
+            if (grid[i][0..j].iter().all(|tree| tree < col)) 
+                || (grid[i][j + 1..=col_max].iter().all(|tree| tree < col))
+            {
+                seen.insert(index);
             }
         }
     }
 }
 
 fn find_score(
-    grid: &Vec<Vec<&u32>>,
+    grid: &[Vec<&u32>],
     row_max: usize,
     col_max: usize,
     scores: &mut Scores,
@@ -134,8 +135,8 @@ fn make_cols(input: &Input, row_max: usize, col_max: usize) -> Vec<Vec<&u32>> {
     let mut cols: Vec<Vec<&u32>> = Vec::new();
     for col in 0..=col_max {
         let mut rotated: Vec<&u32> = Vec::new();
-        for row in 0..=row_max {
-            rotated.push(&input[row][col]);
+        for row in input.iter().take(row_max + 1) {
+            rotated.push(&row[col]);
         }
         cols.push(rotated);
     }

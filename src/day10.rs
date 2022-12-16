@@ -39,10 +39,7 @@ impl Processor {
     }
 
     fn finish_processing(&mut self) {
-        match self.instruction {
-            Some(Instruction::Addx(x)) => self.register += x,
-            _ => (),
-        }
+        if let Some(Instruction::Addx(x)) = self.instruction { self.register += x }
         self.instruction = None;
     }
 
@@ -56,7 +53,7 @@ pub fn generator(input: &str) -> Input {
     input
         .lines()
         .map(|line| {
-            let instruction = line.split_once(" ");
+            let instruction = line.split_once(' ');
             match instruction {
                 None => Instruction::Noop,
                 Some(v) => Instruction::Addx(v.1.parse().unwrap()),

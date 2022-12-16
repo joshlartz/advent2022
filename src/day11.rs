@@ -23,7 +23,7 @@ impl Monkey {
         Self {
             holding: input.holding.clone(),
             operation: {
-                let num: u32 = input.operation.1.parse().unwrap_or_else(|_| 0);
+                let num: u32 = input.operation.1.parse().unwrap_or(0);
                 match input.operation.0 {
                     "*" => match num {
                         0 => Box::new(move |item| item.pow(2)),
@@ -60,7 +60,7 @@ impl Monkey {
     fn test(&self) -> Vec<usize> {
         self.holding
             .iter()
-            .map(|item| match (self.test)(&item) {
+            .map(|item| match (self.test)(item) {
                 true => self.if_true,
                 false => self.if_false,
             })
@@ -95,7 +95,7 @@ pub fn generator(input: &str) -> Vec<Input> {
                     .split_once("= old ")
                     .unwrap()
                     .1
-                    .split_once(" ")
+                    .split_once(' ')
                     .unwrap(),
                 test: lines
                     .next()
@@ -126,8 +126,8 @@ pub fn generator(input: &str) -> Vec<Input> {
         .collect()
 }
 
-pub fn part1(input: &Vec<Input>) -> u32 {
-    let mut monkies: Vec<Monkey> = input.iter().map(|monkey| Monkey::new(monkey)).collect();
+pub fn part1(input: &[Input]) -> u32 {
+    let mut monkies: Vec<Monkey> = input.iter().map(Monkey::new).collect();
 
     for _round in 0..20 {
         for m in 0..monkies.len() {
@@ -200,6 +200,6 @@ Test: divisible by 17
     // #[test]
     // fn test_part2() {
     //     assert_eq!(
-    //         part2(&generator(SAMPLE)), 2);
+    //         part2(&generator(SAMPLE)), 2713310158);
     // }
 }

@@ -34,7 +34,7 @@ pub fn generator(input: &str) -> Input {
     let mut stacks: Vec<Vec<String>> = vec![vec![]; crates[0].len() + 1];
     for each in crates {
         for (index, _crate) in each.iter().enumerate() {
-            if _crate != "" {
+            if !_crate.is_empty() {
                 stacks[index + 1].push(_crate.clone());
             }
         }
@@ -60,7 +60,7 @@ pub fn part1(input: &Input) -> String {
     let mut stacks = stacks.clone();
 
     for step in steps {
-        move_crates_9000(&mut stacks, &step);
+        move_crates_9000(&mut stacks, step);
     }
 
     top_crates(&stacks)
@@ -71,7 +71,7 @@ pub fn part2(input: &Input) -> String {
     let mut stacks = stacks.clone();
 
     for step in steps {
-        move_crates_9001(&mut stacks, &step);
+        move_crates_9001(&mut stacks, step);
     }
 
     top_crates(&stacks)
@@ -80,21 +80,21 @@ pub fn part2(input: &Input) -> String {
 fn top_crates(stacks: &Vec<Stack>) -> String {
     let mut top = vec![""];
     for stack in stacks {
-        if stack.len() > 0 {
+        if !stack.is_empty() {
             top.push(stack.last().unwrap());
         }
     }
     top.concat()
 }
 
-fn move_crates_9000(stacks: &mut Vec<Stack>, step: &Step) -> () {
+fn move_crates_9000(stacks: &mut [Stack], step: &Step) {
     for _ in 0..step.crates {
         let _crate = stacks[step.from].pop().unwrap();
         stacks[step.to].push(_crate);
     }
 }
 
-fn move_crates_9001(stacks: &mut Vec<Stack>, step: &Step) -> () {
+fn move_crates_9001(stacks: &mut [Stack], step: &Step) {
     let len = stacks[step.from].len();
     let mut crates = stacks[step.from]
         .drain((len - step.crates)..)

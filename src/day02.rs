@@ -79,7 +79,7 @@ fn shape(opponent: &char, outcome: &char) -> char {
             _ => panic!("fall through"),
         },
         // draw
-        'Y' => opponent.clone(),
+        'Y' => *opponent,
         // win
         'Z' => match opponent {
             'A' => 'B',

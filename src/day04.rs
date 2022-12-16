@@ -6,9 +6,9 @@ pub fn generator(input: &str) -> Input {
     input
         .lines()
         .map(|line| {
-            line.split(",")
+            line.split(',')
                 .map(|pair| {
-                    let mut sections = pair.split("-");
+                    let mut sections = pair.split('-');
                     (sections.next().unwrap().parse::<u32>().unwrap()
                         ..sections.next().unwrap().parse::<u32>().unwrap() + 1)
                         .collect::<HashSet<_>>()
@@ -25,15 +25,15 @@ pub fn part1(input: &Input) -> usize {
             let overlap = &pair[0].intersection(&pair[1]).count();
             overlap >= &pair[0].len() || overlap >= &pair[1].len()
         })
-        .filter(|overlapping| *overlapping == true)
+        .filter(|overlapping| *overlapping)
         .count()
 }
 
 pub fn part2(input: &Input) -> usize {
     input
         .iter()
-        .map(|pair| &pair[0].intersection(&pair[1]).count() > &0)
-        .filter(|overlapping| *overlapping == true)
+        .map(|pair| pair[0].intersection(&pair[1]).count() > 0)
+        .filter(|overlapping| *overlapping)
         .count()
 }
 

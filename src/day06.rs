@@ -7,11 +7,11 @@ pub fn generator(input: &str) -> Input {
 }
 
 pub fn part1(input: &Input) -> usize {
-    find_start_marker(&input, 4)
+    find_start_marker(input, 4)
 }
 
 pub fn part2(input: &Input) -> usize {
-    find_start_marker(&input, 14)
+    find_start_marker(input, 14)
 }
 
 fn find_start_marker(input: &Input, size: usize) -> usize {
