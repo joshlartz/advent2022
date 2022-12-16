@@ -3,7 +3,7 @@ use std::fmt::Debug;
 use itertools::Itertools;
 
 pub struct Input<'a> {
-    holding: Vec<u32>,
+    holding: Vec<u64>,
     operation: (&'a str, &'a str),
     test: (&'a str, &'a str),
     if_true: usize,
@@ -11,19 +11,19 @@ pub struct Input<'a> {
 }
 
 pub struct Monkey {
-    holding: Vec<u32>,
-    operation: Box<dyn Fn(&u32) -> u32>,
-    test: Box<dyn Fn(&u32) -> bool>,
+    holding: Vec<u64>,
+    operation: Box<dyn Fn(&u64) -> u64>,
+    divisor: u64,
     if_true: usize,
     if_false: usize,
-    inspections: u32,
+    inspections: u64,
 }
 impl Monkey {
     fn new(input: &Input) -> Self {
         Self {
             holding: input.holding.clone(),
             operation: {
-                let num: u32 = input.operation.1.parse().unwrap_or(0);
+                let num: u64 = input.operation.1.parse().unwrap_or(0);
                 match input.operation.0 {
                     "*" => match num {
                         0 => Box::new(move |item| item.pow(2)),
@@ -33,26 +33,22 @@ impl Monkey {
                     _ => panic!("unknown operation"),
                 }
             },
-            test: {
-                let num: u32 = input
-                    .test
-                    .1
-                    .parse()
-                    .unwrap_or_else(|_| panic!("{}", input.test.1));
-                match input.test.0 {
-                    "divisible" => Box::new(move |item| item % num == 0),
-                    _ => panic!("unknown operation"),
-                }
-            },
+            divisor: input
+                .test
+                .1
+                .parse()
+                .unwrap_or_else(|_| panic!("{}", input.test.1)),
             if_true: input.if_true,
             if_false: input.if_false,
             inspections: 0,
         }
     }
 
-    fn inspect(&mut self) {
+    fn inspect(&mut self, large: bool, cycle_length: u64) {
         for item in self.holding.as_mut_slice() {
-            *item = (self.operation)(item) / 3;
+            *item = (self.operation)(item);
+            //reduce worry
+            if large { *item %= cycle_length } else { *item /= 3 };
             self.inspections += 1;
         }
     }
@@ -60,7 +56,7 @@ impl Monkey {
     fn test(&self) -> Vec<usize> {
         self.holding
             .iter()
-            .map(|item| match (self.test)(item) {
+            .map(|item| match item % self.divisor == 0 {
                 true => self.if_true,
                 false => self.if_false,
             })
@@ -126,12 +122,12 @@ pub fn generator(input: &str) -> Vec<Input> {
         .collect()
 }
 
-pub fn part1(input: &[Input]) -> u32 {
-    let mut monkies: Vec<Monkey> = input.iter().map(Monkey::new).collect();
+pub fn rounds(mut monkies: Vec<Monkey>, rounds: u32, large: bool) -> u64 {
+    let cycle_length: u64 = monkies.iter().map(|monkey| monkey.divisor).product();
 
-    for _round in 0..20 {
+    for _round in 0..rounds {
         for m in 0..monkies.len() {
-            monkies[m].inspect();
+            monkies[m].inspect(large, cycle_length);
 
             let throws = monkies[m]
                 .test()
@@ -156,9 +152,13 @@ pub fn part1(input: &[Input]) -> u32 {
         .product()
 }
 
-// pub fn part2(input: &Vec<Input>) -> String {
+pub fn part1(input: &[Input]) -> u64 {
+    rounds(input.iter().map(Monkey::new).collect(), 20, false)
+}
 
-// }
+pub fn part2(input: &[Input]) -> u64 {
+    rounds(input.iter().map(Monkey::new).collect(), 10_000, true)
+}
 
 #[cfg(test)]
 mod tests {
@@ -197,9 +197,8 @@ Test: divisible by 17
         assert_eq!(part1(&generator(SAMPLE)), 10605);
     }
 
-    // #[test]
-    // fn test_part2() {
-    //     assert_eq!(
-    //         part2(&generator(SAMPLE)), 2713310158);
-    // }
+    #[test]
+    fn test_part2() {
+        assert_eq!(part2(&generator(SAMPLE)), 2713310158);
+    }
 }
