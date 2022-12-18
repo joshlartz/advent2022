@@ -1,6 +1,9 @@
 use grid::*;
 use itertools::Itertools;
-use pathfinding::{prelude::{astar, bfs, dijkstra}, num_traits::ToPrimitive};
+use pathfinding::{
+    num_traits::ToPrimitive,
+    prelude::{astar, bfs, dijkstra},
+};
 
 type Input = Grid<i16>;
 type BfsNeighbor = Coord;
@@ -18,7 +21,7 @@ struct Coord {
 
 enum Direction {
     Up,
-    Down
+    Down,
 }
 
 struct Map {
@@ -64,13 +67,13 @@ impl Map {
         position: &Coord,
         mut neighbors: Vec<T>,
         store: fn(Coord) -> T,
-        direction: Direction
+        direction: Direction,
     ) -> Vec<T> {
         let current_elevation = self.grid.get(position.y, position.x).unwrap();
 
         let direction = match direction {
             Direction::Up => up,
-            Direction::Down => down
+            Direction::Down => down,
         };
 
         let mut check_neighbor = |coord: Coord| {
