@@ -16,6 +16,11 @@ struct Coord {
     y: usize,
 }
 
+enum Direction {
+    Up,
+    Down
+}
+
 struct Map {
     grid: Grid<i16>,
     start: Coord,
@@ -42,16 +47,16 @@ impl Map {
         Self { grid, start, end }
     }
 
-    fn bfs_neighbors(&self, position: &Coord) -> Vec<BfsNeighbor> {
+    fn bfs_neighbors(&self, position: &Coord, direction: Direction) -> Vec<BfsNeighbor> {
         let neighbors: Vec<BfsNeighbor> = Vec::new();
         let store = |coord: Coord| coord;
-        self.eligible_neighbors(position, neighbors, store)
+        self.eligible_neighbors(position, neighbors, store, direction)
     }
 
-    fn dijkstra_neighbors(&self, position: &Coord) -> Vec<DijkstraNeighbor> {
+    fn dijkstra_neighbors(&self, position: &Coord, direction: Direction) -> Vec<DijkstraNeighbor> {
         let neighbors: Vec<DijkstraNeighbor> = Vec::new();
         let store = |coord: Coord| (coord, 1);
-        self.eligible_neighbors(position, neighbors, store)
+        self.eligible_neighbors(position, neighbors, store, direction)
     }
 
     fn eligible_neighbors<T>(
@@ -59,12 +64,18 @@ impl Map {
         position: &Coord,
         mut neighbors: Vec<T>,
         store: fn(Coord) -> T,
+        direction: Direction
     ) -> Vec<T> {
         let current_elevation = self.grid.get(position.y, position.x).unwrap();
 
+        let direction = match direction {
+            Direction::Up => up,
+            Direction::Down => down
+        };
+
         let mut check_neighbor = |coord: Coord| {
             if let Some(elevation) = self.grid.get(coord.y, coord.x) {
-                if elevation - current_elevation < 2 {
+                if direction(elevation, current_elevation) {
                     neighbors.push(store(coord))
                 }
             }
@@ -106,6 +117,14 @@ impl Map {
     }
 }
 
+fn up(elevation: &i16, current_elevation: &i16) -> bool {
+    elevation - current_elevation < 2
+}
+
+fn down(elevation: &i16, current_elevation: &i16) -> bool {
+    elevation - current_elevation > -2
+}
+
 pub fn generator(input: &str) -> Input {
     let mut grid = Grid::new(0, 0);
 
@@ -121,7 +140,7 @@ pub fn part1_bfs(input: &Input) -> usize {
 
     let path = bfs(
         &map.start,
-        |coord| map.bfs_neighbors(coord),
+        |coord| map.bfs_neighbors(coord, Direction::Up),
         |coord| map.end.eq(coord),
     )
     .unwrap_or_else(|| panic!("no path found"));
@@ -134,7 +153,7 @@ pub fn part1_dijkstra(input: &Input) -> i16 {
 
     let path = dijkstra(
         &map.start,
-        |coord| map.dijkstra_neighbors(coord),
+        |coord| map.dijkstra_neighbors(coord, Direction::Up),
         |coord| map.end.eq(coord),
     )
     .unwrap_or_else(|| panic!("no path found"));
@@ -147,7 +166,7 @@ pub fn part1_astar(input: &Input) -> i16 {
 
     let path = astar(
         &map.start,
-        |coord| map.dijkstra_neighbors(coord),
+        |coord| map.dijkstra_neighbors(coord, Direction::Up),
         |coord| map.heuristic(coord),
         |coord| map.end.eq(coord),
     )
@@ -156,9 +175,31 @@ pub fn part1_astar(input: &Input) -> i16 {
     path.1
 }
 
-// pub fn part2(input: &[Input]) -> u64 {
-//     rounds(input.iter().map(Monkey::new).collect(), 10_000, true)
-// }
+pub fn part2_bfs(input: &Input) -> usize {
+    let map = Map::new(input);
+
+    let path = bfs(
+        &map.end,
+        |coord| map.bfs_neighbors(coord, Direction::Down),
+        |coord| map.grid[coord.y][coord.x] == b'a' as i16,
+    )
+    .unwrap_or_else(|| panic!("no path found"));
+
+    path.len() - 1
+}
+
+pub fn part2_dijkstra(input: &Input) -> i16 {
+    let map = Map::new(input);
+
+    let path = dijkstra(
+        &map.end,
+        |coord| map.dijkstra_neighbors(coord, Direction::Down),
+        |coord| map.grid[coord.y][coord.x] == b'a' as i16,
+    )
+    .unwrap_or_else(|| panic!("no path found"));
+
+    path.1
+}
 
 #[cfg(test)]
 mod tests {
@@ -185,8 +226,13 @@ abdefghi";
         assert_eq!(part1_astar(&generator(SAMPLE)), 31);
     }
 
-    // #[test]
-    // fn test_part2() {
-    //     assert_eq!(part2(&generator(SAMPLE)), 2713310158);
-    // }
+    #[test]
+    fn test_part2_bfs() {
+        assert_eq!(part2_bfs(&generator(SAMPLE)), 29);
+    }
+
+    #[test]
+    fn test_part2_dijkstra() {
+        assert_eq!(part2_dijkstra(&generator(SAMPLE)), 29);
+    }
 }

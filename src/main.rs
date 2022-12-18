@@ -24,5 +24,5 @@ aoc_main::main! {
   day09 : generator => part1, part2;
   day10 : generator => part1, part2;
   day11 : generator => part1, part2;
-  day12 : generator => part1_bfs, part1_dijkstra, part1_astar;
+  day12 : generator => part1_bfs, part1_dijkstra, part1_astar, part2_bfs, part2_dijkstra;
 }
