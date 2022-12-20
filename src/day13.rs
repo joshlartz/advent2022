@@ -1,31 +1,27 @@
-use std::ops::ControlFlow;
+use std::{cmp::Ordering, ops::ControlFlow};
 
 use itertools::{EitherOrBoth, Itertools};
-use regex::Regex;
 use serde_json::Value;
 
-type Input<'a> = Vec<(&'a str, &'a str)>;
+type Input = Vec<(Vec<Value>, Vec<Value>)>;
 
 pub fn generator(input: &str) -> Input {
     input
         .split("\n\n")
-        .map(|chunk| chunk.split_once('\n').unwrap())
-        .collect()
-}
-
-pub fn part1(input: &Input) -> usize {
-    let json: Vec<(Vec<Value>, Vec<Value>)> = input
-        .iter()
-        .map(|pair| {
+        .map(|chunk| {
+            let pair = chunk.split_once('\n').unwrap();
             (
                 serde_json::from_str(pair.0).unwrap(),
                 serde_json::from_str(pair.1).unwrap(),
             )
         })
-        .collect();
+        .collect()
+}
+
+pub fn part1(input: &Input) -> usize {
     let mut right_pairs: usize = 0;
 
-    for (i, pair) in json.iter().enumerate() {
+    for (i, pair) in input.iter().enumerate() {
         if recursive_parse(&pair.0, &pair.1) == ControlFlow::Break(true) {
             right_pairs += i + 1;
         }
@@ -35,41 +31,28 @@ pub fn part1(input: &Input) -> usize {
 }
 
 pub fn part2(input: &Input) -> usize {
-    let only_brackets = Regex::new(r"^(\[|\])*$").unwrap();
+    let mut flattened: Vec<Vec<Value>> = input.iter().fold(Vec::new(), |mut acc, pair| {
+        acc.push(pair.0.clone());
+        acc.push(pair.1.clone());
+        acc
+    });
 
-    let mut empty_pairs: Vec<&str> = Vec::new();
-    let mut pairs: Vec<Vec<u8>> = input
-        .iter()
-        .fold(Vec::new(), |mut acc, pair| {
-            if only_brackets.is_match(pair.0) {
-                empty_pairs.push(pair.0);
-            } else {
-                acc.push(pair.0);
-            }
-            if only_brackets.is_match(pair.1) {
-                empty_pairs.push(pair.1);
-            } else {
-                acc.push(pair.1);
-            }
-            acc
-        })
-        .iter()
-        .map(|packet| {
-            packet
-                .replace(['[', ']'], "")
-                .split(',')
-                .map(|num| num.parse().unwrap_or_default())
-                .collect()
-        })
-        .collect();
+    let two: Vec<Value> = serde_json::from_str("[[2]]").unwrap();
+    let six: Vec<Value> = serde_json::from_str("[[6]]").unwrap();
+    flattened.push(two.clone());
+    flattened.push(six.clone());
 
-    let two = vec![2];
-    let six = vec![6];
-    pairs.append(&mut vec![two.clone(), six.clone()]);
-    pairs.sort();
+    flattened.sort_by(|left, right| match recursive_parse(left, right) {
+        ControlFlow::Break(true) => Ordering::Less,
+        ControlFlow::Break(false) => Ordering::Greater,
+        ControlFlow::Continue(_) => Ordering::Equal,
+    });
 
-    (pairs.binary_search(&two).unwrap() + empty_pairs.len() + 1)
-        * (pairs.binary_search(&six).unwrap() + empty_pairs.len() + 1)
+    let mut iter = flattened.iter();
+    let two_pos = iter.position(|packet| packet == &two).unwrap() + 1;
+    let six_pos = iter.position(|packet| packet == &six).unwrap() + 1 + two_pos;
+
+    two_pos * six_pos
 }
 
 fn recursive_parse(left: &[Value], right: &[Value]) -> ControlFlow<bool> {
