@@ -9,10 +9,6 @@ type Input = Grid<i16>;
 type BfsNeighbor = Coord;
 type DijkstraNeighbor = (Coord, i16);
 
-pub trait Neighbor<T> {
-    fn neighbor(&self) -> Vec<T>;
-}
-
 #[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 struct Coord {
     x: usize,
@@ -112,6 +108,7 @@ impl Map {
         neighbors
     }
 
+    #[allow(dead_code)]
     fn heuristic(&self, position: &Coord) -> i16 {
         let a = self.end.y.abs_diff(position.y);
         let b = self.end.x.abs_diff(position.x);
@@ -138,7 +135,7 @@ pub fn generator(input: &str) -> Input {
     grid
 }
 
-pub fn part1_bfs(input: &Input) -> usize {
+pub fn part1(input: &Input) -> usize {
     let map = Map::new(input);
 
     let path = bfs(
@@ -151,6 +148,7 @@ pub fn part1_bfs(input: &Input) -> usize {
     path.len() - 1
 }
 
+#[allow(dead_code)]
 pub fn part1_dijkstra(input: &Input) -> i16 {
     let map = Map::new(input);
 
@@ -164,6 +162,7 @@ pub fn part1_dijkstra(input: &Input) -> i16 {
     path.1
 }
 
+#[allow(dead_code)]
 pub fn part1_astar(input: &Input) -> i16 {
     let map = Map::new(input);
 
@@ -178,7 +177,7 @@ pub fn part1_astar(input: &Input) -> i16 {
     path.1
 }
 
-pub fn part2_bfs(input: &Input) -> usize {
+pub fn part2(input: &Input) -> usize {
     let map = Map::new(input);
 
     let path = bfs(
@@ -191,6 +190,7 @@ pub fn part2_bfs(input: &Input) -> usize {
     path.len() - 1
 }
 
+#[allow(dead_code)]
 pub fn part2_dijkstra(input: &Input) -> i16 {
     let map = Map::new(input);
 
@@ -215,27 +215,15 @@ acctuvwj
 abdefghi";
 
     #[test]
-    fn test_part1_bfs() {
-        assert_eq!(part1_bfs(&generator(SAMPLE)), 31);
-    }
-
-    #[test]
-    fn test_part1_dijkstra() {
+    fn test_part1() {
+        assert_eq!(part1(&generator(SAMPLE)), 31);
         assert_eq!(part1_dijkstra(&generator(SAMPLE)), 31);
-    }
-
-    #[test]
-    fn test_part1_astar() {
         assert_eq!(part1_astar(&generator(SAMPLE)), 31);
     }
 
     #[test]
-    fn test_part2_bfs() {
-        assert_eq!(part2_bfs(&generator(SAMPLE)), 29);
-    }
-
-    #[test]
-    fn test_part2_dijkstra() {
+    fn test_part2() {
+        assert_eq!(part2(&generator(SAMPLE)), 29);
         assert_eq!(part2_dijkstra(&generator(SAMPLE)), 29);
     }
 }

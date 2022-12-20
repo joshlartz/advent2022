@@ -10,6 +10,7 @@ mod day09;
 mod day10;
 mod day11;
 mod day12;
+mod day13;
 
 aoc_main::main! {
   year 2022;
@@ -24,5 +25,6 @@ aoc_main::main! {
   day09 : generator => part1, part2;
   day10 : generator => part1, part2;
   day11 : generator => part1, part2;
-  day12 : generator => part1_bfs, part1_dijkstra, part1_astar, part2_bfs, part2_dijkstra;
+  day12 : generator => part1, part2;
+  day13 : generator => part1, part2;
 }
