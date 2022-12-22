@@ -2,7 +2,7 @@ use grid::*;
 use pathfinding::num_traits::ToPrimitive;
 use std::ops::ControlFlow;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Coord {
     x: usize,
     y: usize,
@@ -64,9 +64,24 @@ pub fn part1(input: &Input) -> usize {
     }
 }
 
-// pub fn part2(input: &Input) -> usize {
+pub fn part2(input: &Input) -> usize {
+    let mut grid: Grid<char> = Grid::init(input.y + 2, input.x + input.y, '.');
 
-// }
+    draw_rocks(&mut grid, &input.lines);
+
+    draw_floor(&mut grid);
+    
+    // print_grid(&grid);
+
+    let mut count = 0;
+    loop {
+        if sand(&mut grid, SOURCE).is_break() {
+            // print_grid(&grid);
+            return count + 1;
+        }
+        count += 1;
+    }
+}
 
 fn draw_rocks(grid: &mut Grid<char>, lines: &Lines) {
     for points in lines {
@@ -114,17 +129,24 @@ fn sand(grid: &mut Grid<char>, mut grain: Coord) -> ControlFlow<Coord> {
         return sand(grid, grain);
     }
 
-    if grid.get(grain.y + 1, grain.x).is_none() {
+    grid[grain.y][grain.x] = 'o';
+
+    if grid.get(grain.y + 1, grain.x).is_none() || grain == SOURCE {
         return ControlFlow::Break(grain);
     }
-    grid[grain.y][grain.x] = 'o';
+
     ControlFlow::Continue(())
 }
 
+#[allow(dead_code)]
 fn print_grid(grid: &Grid<char>) {
     for row in 0..grid.rows() {
         println!("{:?}", grid[row].iter().collect::<String>());
     }
+}
+
+fn draw_floor(grid: &mut Grid<char>) {
+    grid.push_row(vec!['#'; grid.cols()]);
 }
 
 #[cfg(test)]
@@ -139,8 +161,8 @@ mod tests {
         assert_eq!(part1(&generator(SAMPLE)), 24);
     }
 
-    // #[test]
-    // fn test_part2() {
-    //     assert_eq!(part2(&generator(SAMPLE)), 140);
-    // }
+    #[test]
+    fn test_part2() {
+        assert_eq!(part2(&generator(SAMPLE)), 93);
+    }
 }

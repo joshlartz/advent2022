@@ -28,5 +28,5 @@ aoc_main::main! {
   day11 : generator => part1, part2;
   day12 : generator => part1, part2;
   day13 : generator => part1, part2;
-  day14 : generator => part1;
+  day14 : generator => part1, part2;
 }
