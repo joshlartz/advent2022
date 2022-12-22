@@ -51,7 +51,7 @@ pub fn part1(input: &Input) -> usize {
     let mut grid: Grid<char> = Grid::init(input.y + 1, input.x + 1, '.');
 
     draw_rocks(&mut grid, &input.lines);
-    
+
     // print_grid(&grid);
 
     let mut count = 0;
@@ -70,7 +70,7 @@ pub fn part2(input: &Input) -> usize {
     draw_rocks(&mut grid, &input.lines);
 
     draw_floor(&mut grid);
-    
+
     // print_grid(&grid);
 
     let mut count = 0;
