@@ -2,7 +2,7 @@ use grid::*;
 use pathfinding::num_traits::ToPrimitive;
 use std::ops::ControlFlow;
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Coord {
     x: usize,
     y: usize,
